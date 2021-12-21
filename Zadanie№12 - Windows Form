@@ -1,0 +1,185 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Text.RegularExpressions;
+
+namespace Zadanie_12
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        class String
+        {
+            private StringBuilder Line;
+            private int n;
+
+            public String(string str)
+            {
+                Line = new StringBuilder(str);
+                n = str.Length;
+            }
+            public int CountSpaces()
+            {
+                int count = 0;
+                for (int i = 0; i < Line.Length; i++)
+                {
+                    if (Line[i] == ' ')
+                    {
+                        count++;
+                    }
+                }
+                return count;
+            }
+            public string replacing_characters(string str)
+            {
+                Regex pattern = new Regex(@"(?!^)(?=[A-Z])");
+
+                return pattern.Replace(str, "_").ToLower();
+            }
+            public string remove_punctuation(string str)
+            {
+                str = Line.ToString();
+                Line.Clear();
+                Line.Append(Regex.Replace(str, "[,.:?!]", ""));
+                n = Line.Length;
+                return Line.ToString();
+            }
+            public int Length
+            {
+                get
+                {
+                    return n;
+                }
+            }
+
+            //индексатор позволяющий по индексу обращаться к соответствующему символу строки.
+            public char this[int index]
+            {
+                get
+                {
+                    return Line[index];
+                }
+            }
+
+            //Перегрузка операции унарного (+): преобразующей строку к строчным символам;
+            public static string operator +(String st)
+            {
+                return st.Line.ToString().ToLower();
+            }
+
+            //Операция унарного -: преобразующей строку к прописным символам;
+            public static string operator -(String st)
+            {
+                return st.Line.ToString().ToUpper();
+            }
+
+            //Констант true и false: обращение к экземпляру класса дает значение true, если строка не пустая, иначе false.
+            //Перегрузка констант (true)
+            public static bool operator true(String st)
+            {
+                if (st.Length > 0)
+                    return true;
+                else
+                    return false;
+            }
+
+            //Перегрузка констант (false)
+            public static bool operator false(String st)
+            {
+                if (st.Length == 0)
+                    return true;
+                else
+                    return false;
+            }
+
+            //Перегрузка операции (&): возвращает значение true, если строковые поля двух объектов посимвольно равны (без учета регистра), иначе false;
+            public static bool operator &(String st1, String st2)
+            {
+                return st1.Line.ToString().ToUpper().Equals(st2.Line.ToString().ToUpper());
+            }
+
+            //Преобразования класса-строка в тип string.
+            public static explicit operator String(string str)
+            {
+                return new String(str);
+            }
+            //Преобразования типа string в класс-строка.
+            public static explicit operator string(String st)
+            {
+                return st.Line.ToString();
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string text_box2 = textBox2.Text;
+                string str = text_box2;
+                string text_box1 = textBox1.Text;
+                string str2 = text_box1;
+                string text_box4 = textBox4.Text;
+                int index = int.Parse(text_box4);
+                if (index < str.Length)
+                {
+
+                    String st = new String(str);
+
+                    textBox3.Text += "\r\n";
+                    textBox3.Text += ("Исходная строка: " + str + " Длина: " + st.Length);
+                    textBox3.Text += ("\r\n| Подсчитывает количество пробелов в строке.");
+                    textBox3.Text += ("\r\nКоличество пробелов в строке: " + st.CountSpaces() + "\r\n");
+                    textBox3.Text += ("| Заменяет в строке все прописные символы на строчные.");
+                    textBox3.Text += ("\r\nИзмененная строка: " + st.replacing_characters(str) + "\r\n"); //заменяет в строке все прописные символы на строчные;
+                    textBox3.Text += ("| Удаляет из строки все знаки препинания.");
+                    textBox3.Text += ("\r\nИсходная строка: " + str, "Строка без знаков препинания: " + st.remove_punctuation(str) + " Длина: " + st.Length);
+
+                    textBox3.Text += ("\r\nВведите индекс, чтобы обратиться к соответствующему символу строки:");
+                    textBox3.Text += ($"\r\nВ строке \"{str}\", Вы обратились к символу: \"{st[index]}\"");
+
+                    textBox3.Text += ($"\r\nПреобразование строки к строчным символам:  {+st}");
+                    textBox3.Text += ($"\r\nПреобразование строки к прописным символам:  {-st}");
+
+                    if (st)
+                        textBox3.Text += ("\r\nСтрока не пустая.");
+                    else
+                        textBox3.Text += ("\r\nСтрока пустая.");
+
+                    String st2 = new String(str2);
+                    textBox3.Text += ($"\r\nРавны ли строки? {st & st2}");
+                }
+                else
+                    textBox3.Text += ("Ошибка! Индекс не может быть больше строки");
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show("Ошибка! Неверный формат.");
+            }
+        }
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
+            textBox3.ScrollBars = ScrollBars.Vertical;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            textBox3.Text = null;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+    }
+}
